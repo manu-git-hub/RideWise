@@ -76,23 +76,25 @@ Contains the core plain Java objects representing the business.
 - `RideStatus.java` / `VehicleType.java`: Enums governing strictly typed states.
 
 ### 2. `strategy/` (Algorithm Implementations)
-Implements the **Strategy Pattern** to ensure the **Open-Closed Principle (OCP)**.
+Implements the **Strategy Pattern** to ensure the **Open-Closed Principle (OCP)**. Also demonstrates the **Composite Pattern** for dynamic logic.
 - **`RideMatchingStrategy.java`**: Interface for matching logic.
   - `NearestDriverStrategy.java`: Matches the driver physically closest to the rider using a string-heuristic comparison.
   - `LeastActiveDriverStrategy.java`: Matches the driver with the fewest total completed trips to ensure fair workload distribution.
+  - `SmartMatchingStrategy.java`: A **Composite Strategy** that automatically prioritizes the nearest driver, but dynamically delegates to the least active driver if the nearest driver is overworked (>= 3 trips).
 - **`FareStrategy.java`**: Interface for pricing logic.
   - `DefaultFareStrategy.java`: Calculates based on a flat Rs 15 base + Rs 12 per kilometer.
-  - `PeakHourFareStrategy.java`: Applies a 1.5x surge multiplier during specific hours.
+  - `PeakHourFareStrategy.java`: A **Decorator Strategy** that wraps `DefaultFareStrategy`. It inherently delegates the base fare calculation to the default strategy and applies a 1.5x surge multiplier dynamically during peak hours (08:00-10:00 & 17:00-20:00).
 
 ### 3. `service/` (Business Logic Orchestration)
 Services orchestrate the entities but depend on abstractions (interfaces) rather than concrete algorithms, fulfilling the **Dependency Inversion Principle (DIP)**.
 - `RiderService.java`: Manages the in-memory store of riders.
 - `DriverService.java`: Manages drivers and toggles their availability status.
-- `RideService.java`: The core orchestrator. It receives `DriverService`, `RideMatchingStrategy`, and `FareStrategy` via constructor injection. It handles booking, cancelling, and completing rides.
+- `RideService.java`: The core orchestrator. It receives `DriverService`, `RideMatchingStrategy`, and `FareStrategy` via constructor injection. 
+  - **Vehicle Filtering**: When requesting a ride, the system filters the pool of available drivers by the user's requested `VehicleType` (BIKE, AUTO, CAR) *before* passing the list to the matching strategy. This perfectly preserves the generic strategy interface while satisfying domain requirements.
 
 ### 4. `console/` (User Interface)
 Isolates the terminal I/O from the business logic.
-- `RideWiseApp.java`: Contains the main `while(running)` menu loop and handles routing user choices to the correct service methods.
+- `RideWiseApp.java`: Contains the main `while(running)` menu loop and handles routing user choices to the correct service methods. It provides a polished UI with automatic input normalization (e.g. `toLowerCase()` / `toUpperCase()` conversions for IDs).
 - `ConsoleInput.java`: Robust input wrapper that prevents the app from crashing when a user types letters instead of numbers.
 - `ConsoleOutput.java`: Centralized formatting logic for printing banners, menus, and receipts.
 
@@ -104,7 +106,7 @@ Isolates the terminal I/O from the business logic.
 
 ## Entry Point (`Main.java`)
 The `Main.java` file acts exclusively as the **Composition Root**. It does not contain business logic. Instead, it:
-1. Prompts the user to select which concrete strategies to use for this session.
+1. Automatically configures and instantiates the backend strategies (`SmartMatchingStrategy`, `PeakHourFareStrategy`) so that the application adapts autonomously without user intervention.
 2. Instantiates the Services and injects the chosen strategies.
 3. Passes the services into `RideWiseApp` to begin the interactive menu.
 
@@ -124,4 +126,4 @@ The `Main.java` file acts exclusively as the **Composition Root**. It does not c
    ```bash
    java -cp ../out com.airtribe.ridewise.Main
    ```
-4. You will be prompted to select your Matching and Fare strategies. After selection, the main menu will appear allowing you to register users and book rides.
+4. The main menu will appear allowing you to register users and book rides.
