@@ -92,17 +92,24 @@ public class RideWiseApp {
         ConsoleOutput.info("Registered riders:");
         ConsoleOutput.printRiders(riderService.findAll());
 
-        String riderId = input.readNonBlank("  Rider ID : ");
+        String riderId = input.readNonBlank("  Rider ID (e.g. RDR-001): ").toUpperCase();
         Rider rider = riderService.findById(riderId).orElse(null);
         if (rider == null) {
             ConsoleOutput.error("Rider not found: " + riderId);
             return;
         }
 
+        System.out.println("  Select Requested Vehicle Type:");
+        System.out.println("    1. BIKE");
+        System.out.println("    2. AUTO");
+        System.out.println("    3. CAR");
+        int vtChoice = input.readInt("  Vehicle [1-3]: ", 1, 3);
+        VehicleType requestedType = VehicleType.values()[vtChoice - 1];
+
         double distance = input.readDouble("  Distance (km): ", 0.1, 500.0);
 
         try {
-            Ride ride = rideService.requestRide(rider, distance);
+            Ride ride = rideService.requestRide(rider, distance, requestedType);
             ConsoleOutput.success("Ride booked — " + ride);
         } catch (NoDriverAvailableException e) {
             ConsoleOutput.error(e.getMessage());
@@ -121,7 +128,7 @@ public class RideWiseApp {
         ConsoleOutput.info("Rides awaiting completion:");
         ConsoleOutput.printRides(assignedRides);
 
-        String rideId = input.readNonBlank("  Ride ID: ");
+        String rideId = input.readNonBlank("  Ride ID (e.g. RIDE-0001): ").toUpperCase();
         try {
             FareReceipt receipt = rideService.completeRide(rideId);
             ConsoleOutput.success("Ride completed.");
@@ -145,7 +152,7 @@ public class RideWiseApp {
         ConsoleOutput.info("Cancellable rides:");
         ConsoleOutput.printRides(cancellable);
 
-        String rideId = input.readNonBlank("  Ride ID: ");
+        String rideId = input.readNonBlank("  Ride ID (e.g. RIDE-0001): ").toUpperCase();
         try {
             rideService.cancelRide(rideId);
             ConsoleOutput.success("Ride " + rideId + " cancelled.");

@@ -28,10 +28,13 @@ public class RideService {
     }
 
 
-    public Ride requestRide(Rider rider, double distanceKm)
+    public Ride requestRide(Rider rider, double distanceKm, VehicleType requestedVehicleType)
             throws NoDriverAvailableException {
 
-        var availableDrivers = driverService.findAvailable();
+        var availableDrivers = driverService.findAvailable().stream()
+                .filter(d -> d.getVehicleType() == requestedVehicleType)
+                .collect(Collectors.toList());
+
         Driver driver = matchingStrategy.findDriver(rider, availableDrivers);
 
         if (driver == null) {
