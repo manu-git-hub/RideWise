@@ -6,8 +6,7 @@ import java.time.LocalTime;
 
 public class PeakHourFareStrategy implements FareStrategy {
 
-    private static final double BASE_FARE = 15.0;
-    private static final double RATE_PER_KM = 12.0;
+    private final DefaultFareStrategy defaultFareStrategy = new DefaultFareStrategy();
     private static final double SURGE_MULTIPLIER = 1.5;
 
     private record TimeWindow(LocalTime start, LocalTime end) {
@@ -23,15 +22,14 @@ public class PeakHourFareStrategy implements FareStrategy {
 
     @Override
     public double calculateFare(Ride ride) {
-        double base = BASE_FARE + (RATE_PER_KM * ride.getDistanceKm());
+        double base = defaultFareStrategy.calculateFare(ride);
         return isPeakHour() ? base * SURGE_MULTIPLIER : base;
     }
 
     @Override
     public String label() {
-        return String.format(
-                "Peak-Hour (Rs %.0f base + Rs %.0f/km, %.1fx surge 08-10 & 17-20)",
-                BASE_FARE, RATE_PER_KM, SURGE_MULTIPLIER);
+        return defaultFareStrategy.label() + String.format(
+                " with Peak-Hour %.1fx surge (08-10 & 17-20)", SURGE_MULTIPLIER);
     }
 
     private boolean isPeakHour() {

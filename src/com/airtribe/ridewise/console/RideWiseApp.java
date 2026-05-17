@@ -19,15 +19,14 @@ public class RideWiseApp {
     private final ConsoleInput input;
 
     public RideWiseApp(RiderService riderService,
-                       DriverService driverService,
-                       RideService rideService,
-                       ConsoleInput input) {
+            DriverService driverService,
+            RideService rideService,
+            ConsoleInput input) {
         this.riderService = riderService;
         this.driverService = driverService;
         this.rideService = rideService;
         this.input = input;
     }
-
 
     public void run() {
         ConsoleOutput.printBanner(
@@ -65,14 +64,14 @@ public class RideWiseApp {
         ConsoleOutput.sectionHeader("Add Driver");
         String name = input.readNonBlank("  Name    : ");
         String location = input.readNonBlank("  Location: ");
-        
+
         System.out.println("  Select Vehicle Type:");
         System.out.println("    1. BIKE");
         System.out.println("    2. AUTO");
         System.out.println("    3. CAR");
         int vtChoice = input.readInt("  Vehicle [1-3]: ", 1, 3);
         VehicleType vt = VehicleType.values()[vtChoice - 1];
-        
+
         var driver = driverService.register(name, location, vt);
         ConsoleOutput.success("Driver registered — " + driver);
     }

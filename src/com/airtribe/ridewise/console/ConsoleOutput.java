@@ -7,7 +7,6 @@ import com.airtribe.ridewise.model.Rider;
 
 import java.util.Collection;
 
-
 public final class ConsoleOutput {
 
     private static final String LINE = "─".repeat(56);
@@ -18,7 +17,6 @@ public final class ConsoleOutput {
     private ConsoleOutput() {
     }
 
-
     public static void printBanner(String matchingLabel, String fareLabel) {
         System.out.println();
         System.out.println("  ╔══════════════════════════════════════════════════════╗");
@@ -28,7 +26,6 @@ public final class ConsoleOutput {
         System.out.printf("  ║  Pricing  : %-40s║%n", fareLabel);
         System.out.println("  ╚══════════════════════════════════════════════════════╝");
     }
-
 
     public static void printMenu() {
         System.out.println();
@@ -45,7 +42,6 @@ public final class ConsoleOutput {
         System.out.println("   8. Exit");
         System.out.println("  " + LINE);
     }
-
 
     public static void success(String msg) {
         System.out.println(OK + msg);
@@ -87,7 +83,6 @@ public final class ConsoleOutput {
         System.out.printf("  │  Generated  : %-38s│%n", receipt.getGeneratedAt());
         System.out.println("  └────────────────────────────────────────────────────┘");
     }
-
 
     public static void printRiders(Collection<Rider> riders) {
         if (riders.isEmpty()) {

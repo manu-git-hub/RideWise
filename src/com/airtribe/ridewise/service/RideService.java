@@ -31,11 +31,12 @@ public class RideService {
     public Ride requestRide(Rider rider, double distanceKm)
             throws NoDriverAvailableException {
 
-        List<Driver> available = driverService.findAvailable();
+        var availableDrivers = driverService.findAvailable();
+        Driver driver = matchingStrategy.findDriver(rider, availableDrivers);
 
-        Driver driver = matchingStrategy.findDriver(rider, available)
-                .orElseThrow(() -> new NoDriverAvailableException(
-                        "No available driver found for rider: " + rider.getName()));
+        if (driver == null) {
+            throw new NoDriverAvailableException("No drivers are currently available for this ride.");
+        }
 
         Ride ride = new Ride(IdGenerator.nextRideId(), rider, distanceKm);
         ride.assignDriver(driver);

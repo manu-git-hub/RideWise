@@ -11,14 +11,15 @@ import java.util.Optional;
 public class NearestDriverStrategy implements RideMatchingStrategy {
 
     @Override
-    public Optional<Driver> findDriver(Rider rider, List<Driver> drivers) {
-        if (drivers == null || drivers.isEmpty()) return Optional.empty();
+    public Driver findDriver(Rider rider, List<Driver> drivers) {
+        if (drivers == null || drivers.isEmpty()) return null;
 
         String riderLoc = rider.getLocation().toLowerCase();
 
         return drivers.stream()
                 .min(Comparator.comparingInt(
-                        d -> locationDistance(riderLoc, d.getCurrentLocation().toLowerCase())));
+                        d -> locationDistance(riderLoc, d.getCurrentLocation().toLowerCase())))
+                .orElse(null);
     }
 
     @Override

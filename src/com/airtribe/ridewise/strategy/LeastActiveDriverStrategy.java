@@ -11,11 +11,12 @@ import java.util.Optional;
 public class LeastActiveDriverStrategy implements RideMatchingStrategy {
 
     @Override
-    public Optional<Driver> findDriver(Rider rider, List<Driver> drivers) {
-        if (drivers == null || drivers.isEmpty()) return Optional.empty();
+    public Driver findDriver(Rider rider, List<Driver> drivers) {
+        if (drivers == null || drivers.isEmpty()) return null;
 
         return drivers.stream()
-                .min(Comparator.comparingInt(Driver::getTotalTripsCompleted));
+                .min(Comparator.comparingInt(Driver::getTotalTripsCompleted))
+                .orElse(null);
     }
 
     @Override
